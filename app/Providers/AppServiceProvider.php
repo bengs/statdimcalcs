@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Statamic\Statamic;
+use Illuminate\Support\Collection;
+use Spatie\ResponsiveImages\Source;
+use Illuminate\Support\ServiceProvider;
+use Spatie\ResponsiveImages\Dimensions;
+use Spatie\ResponsiveImages\ResponsiveDimensionCalculator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +30,25 @@ class AppServiceProvider extends ServiceProvider
     {
         // Statamic::script('app', 'cp');
         // Statamic::style('app', 'cp');
+
+        $this->app->bind(DimensionCalculator::class, function () {
+            return new class extends ResponsiveDimensionCalculator {
+                public function calculateForBreakpoint(Source $source): Collection
+                {
+                    return null;
+
+                    // Disable JPG sources
+                    if ($source->getFormat() === 'original') {
+                        return collect([]);
+                    }
+
+                    // Create widths from 500 to 2000 in 100px increments with fixedHeight passed from params
+                    return collect(range(500, 2000, 500))
+                        ->map(function ($width) use ($source) {
+                            return new Dimensions($width, $source->breakpoint->params['fixedHeight']);
+                        });
+                }
+            };
+        });
     }
 }
