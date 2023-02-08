@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
                         return collect([]);
                     }
 
-                    // Create widths from 500 to 2000 in 100px increments with fixedHeight passed from params
+                    // Create widths from 500 to 2000 in 599ox increments with fixedHeight passed from params
                     return collect(range(500, 2000, 500))
                         ->map(function ($width) use ($source) {
                             return new Dimensions($width, $source->breakpoint->params['fixedHeight']);
